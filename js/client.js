@@ -3,12 +3,16 @@ var ip = require('ip');
 var PORT = 5555;
 var HOST = '';
 net = require('net');
+os = require ('os');
+var myip = ip.address;
+var hostname = os.hostname();
+
 //console.log(ip.address());
 
 function iniciar() {
 
 var dgram = require("dgram");
-var message = "Mi ip es: "+ip.address;
+var message = hostname.toString();
 
 clientUDP = dgram.createSocket("udp4");
 clientUDP.on('err',function(err){
@@ -19,8 +23,9 @@ clientUDP.on('err',function(err){
 clientUDP.on('message', (msg, rinfo) => {
 
 if(conectar_tcp){
+  console.log("PUERTO TCP "+msg);
   clientUDP.close();
-  TCP(rinfo.address,9999);
+  TCP(rinfo.address,parseInt(msg));
 }
 else{
 console.log("llego por UDP.......");
@@ -39,9 +44,9 @@ clientUDP.bind(PORT);
 }
 
 function TCP(ip_tcp,port_tcp){
+    fecha=new Date();
     clientTCP = net.connect({port:port_tcp, host:ip_tcp}, () => {
     console.log('connected to server TCP!');
-    //clientTCP.write(JSON.stringify(json));
     });
     clientTCP.on('data', (data) => {
     console.log("llego por TCP...");
@@ -51,4 +56,8 @@ function TCP(ip_tcp,port_tcp){
         console.log("El Servidor se Desconecto");
         //location.href='index.html';
     });
+}
+
+function desconectar() {
+  clientTCP.destroy();
 }

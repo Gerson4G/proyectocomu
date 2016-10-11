@@ -1,7 +1,10 @@
-var portTCP = 9999;
+var fecha = [];
+var portTCP = [];
 net = require('net');
 var ip = require('ip');
-
+var enviarPuerto = false;
+var hostnames = [];
+var ips = [];
 function iniciar() {
 
   var dgram = require('dgram');
@@ -17,11 +20,28 @@ function iniciar() {
   });
   socket.on('message', (msg, rinfo) => {
     console.log("Message received from " + rinfo.address);
-    TCP(ip.address,portTCP);
+    portTCP.push(abrirPuerto());
+    hostnames.push(msg.toString());
+    ips.push(rinfo.address);
+    TCP(ip.address,portTCP[portTCP.length-1]);
+    enviarPuerto = true;
+
+    if(enviarPuerto){
+      console.log('ENVIANDO PUERTO '+portTCP[portTCP.length-1]);
+      var mensaje = portTCP[portTCP.length-1].toString();
+      socket.send(new Buffer (mensaje), 0, mensaje.length, rinfo.port , rinfo.address, function(err, bytes) {
+        if (err) throw err;
+        console.log('Puerto enviado');
+      });
+      enviarPuerto=false;
+    }
+
   });
 
+
+
   setInterval(function () {
-  	socket.send(new Buffer(testMessage),
+ 	socket.send(new Buffer(testMessage),
   			0,
   			testMessage.length,
   			broadcastPort,
@@ -39,6 +59,7 @@ function TCP(ip,port_tcp){
 
     serverTCP = net.createServer(function(socket) {
     console.log('client connected');
+    fecha.push(new Date().getTime());
     socket.name = socket.remoteAddress;
 
     socket.on('error', (e) => {
@@ -50,6 +71,13 @@ function TCP(ip,port_tcp){
      });
     socket.on('end', () => {
         console.log('client disconnected');
+        console.log(ip.toString());
+        for(i=0;i<ips.length;i++){
+          if(ip.toString()==ips[i]){
+            var aux=new Date();
+            fecha[i]=aux.getTime()-fecha[i].getTime();
+          }
+        }
     });
 
     socket.on('data', (data) => {
@@ -60,4 +88,8 @@ function TCP(ip,port_tcp){
     serverTCP.listen(port_tcp,ip, () => {
     console.log('server escuchando');
     });
+}
+
+function abrirPuerto() {
+  return Math.floor((Math.random() * 9999) + 2500);
 }
