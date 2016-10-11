@@ -1,0 +1,19 @@
+{
+  "name": "proyectocomu",
+  "version": "1.0.0",
+  "description": "Proyecto 1 de comunicaciones. Servidor que registra tiempos de conexion",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gerson4G/proyectocomu.git"
+  },
+  "author": "Gerson Goatache, Miguel Bolivar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gerson4G/proyectocomu/issues"
+  },
+  "homepage": "https://github.com/Gerson4G/proyectocomu#readme"
+}
