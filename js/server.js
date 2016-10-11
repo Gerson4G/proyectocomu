@@ -63,19 +63,18 @@ function TCP(ip,port_tcp){
     socket.name = socket.remoteAddress;
 
     socket.on('error', (e) => {
-            /*Llamar aqui la funcion que quita el cliente de los vectores
-                la ip del cliente q se desconecta esta guarda en socket.name
-            */
+
             console.log(socket.name);
 
      });
     socket.on('end', () => {
         console.log('client disconnected');
-        console.log(ip.toString());
+        console.log(socket.remoteAddress);
         for(i=0;i<ips.length;i++){
-          if(ip.toString()==ips[i]){
+          if(socket.remoteAddress.replace(/^.*:/, '')==ips[i]){ //lo q pasa
+                              // es q remoteAddress esta como ipv6 y anexa ::ffff:direccion entonces asi le quito lo de ipv6
             var aux=new Date();
-            fecha[i]=aux.getTime()-fecha[i].getTime();
+            fecha[i]=(aux.getTime()-fecha[i])/1000;
           }
         }
     });
