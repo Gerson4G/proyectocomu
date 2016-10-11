@@ -17,8 +17,8 @@ let mainWindow;
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 400,
+    height: 400,
     //icon:('./img/ico.png'),
     //resizable:false
   });

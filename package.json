@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/Gerson4G/proyectocomu/issues"
   },
-  "homepage": "https://github.com/Gerson4G/proyectocomu#readme"
+  "homepage": "https://github.com/Gerson4G/proyectocomu#readme",
+  "dependencies": {
+    "ip": "^1.1.3",
+    "net": "^1.0.2",
+    "os": "^0.1.1"
+  }
 }

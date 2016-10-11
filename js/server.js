@@ -1,3 +1,7 @@
+var portTCP = 9999;
+net = require('net');
+var ip = require('ip');
+
 function iniciar() {
 
   var dgram = require('dgram');
@@ -11,9 +15,9 @@ function iniciar() {
   socket.bind(function(){
       socket.setBroadcast(true);
   });
-
-  socket.on("message", function ( data, rinfo ) {
-  	console.log("Message received from ", rinfo.address, " : ", data.toString());
+  socket.on('message', (msg, rinfo) => {
+    console.log("Message received from " + rinfo.address);
+    TCP(ip.address,portTCP);
   });
 
   setInterval(function () {
@@ -29,4 +33,31 @@ function iniciar() {
   			}
   	);
   }, 1000);
+}
+
+function TCP(ip,port_tcp){
+
+    serverTCP = net.createServer(function(socket) {
+    console.log('client connected');
+    socket.name = socket.remoteAddress;
+
+    socket.on('error', (e) => {
+            /*Llamar aqui la funcion que quita el cliente de los vectores
+                la ip del cliente q se desconecta esta guarda en socket.name
+            */
+            console.log(socket.name);
+
+     });
+    socket.on('end', () => {
+        console.log('client disconnected');
+    });
+
+    socket.on('data', (data) => {
+        console.log("llego por TCP.......");
+    });
+
+    });
+    serverTCP.listen(port_tcp,ip, () => {
+    console.log('server escuchando');
+    });
 }
