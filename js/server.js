@@ -5,6 +5,8 @@ var ip = require('ip');
 var enviarPuerto = false;
 var hostnames = [];
 var ips = [];
+var cerrado = false;
+
 function iniciar() {
 
   var dgram = require('dgram');
@@ -70,17 +72,16 @@ function TCP(ip,port_tcp){
     socket.on('end', () => {
         console.log('client disconnected');
         console.log(socket.remoteAddress);
-        for(i=0;i<ips.length;i++){
-          if(socket.remoteAddress.replace(/^.*:/, '')==ips[i]){ //lo q pasa
-                              // es q remoteAddress esta como ipv6 y anexa ::ffff:direccion entonces asi le quito lo de ipv6
-            var aux=new Date();
-            fecha[i]=(aux.getTime()-fecha[i])/1000;
-          }
-        }
+
+          registroTiempo(socket,cerrado)
+
     });
 
     socket.on('data', (data) => {
-        console.log("llego por TCP.......");
+        //console.log("llego por TCP.......");
+        if(data.toString()=="Cerrar"){
+            cerrado=true;
+            }
     });
 
     });
@@ -91,4 +92,25 @@ function TCP(ip,port_tcp){
 
 function abrirPuerto() {
   return Math.floor((Math.random() * 9999) + 2500);
+}
+
+function registroTiempo(socket,check){
+
+if(check)
+  for(i=0;i<ips.length;i++){
+      if(socket.remoteAddress.replace(/^.*:/, '')==ips[i]){ //lo q pasa
+                        // es q remoteAddress esta como ipv6 y anexa ::ffff:direccion entonces asi le quito lo de ipv6
+      var aux=new Date();
+      fecha[i]=(aux.getTime()-fecha[i])/1000;
+      }
+    }
+else {
+  for(i=0;i<ips.length;i++){
+      if(socket.remoteAddress.replace(/^.*:/, '')==ips[i]){
+      fecha[i]=0;
+      }
+    }
+
+}
+cerrado=false;
 }

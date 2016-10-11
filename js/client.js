@@ -6,6 +6,8 @@ net = require('net');
 os = require ('os');
 var myip = ip.address;
 var hostname = os.hostname();
+var puertoServer;
+var ipServer;
 
 //console.log(ip.address());
 
@@ -23,6 +25,8 @@ clientUDP.on('err',function(err){
 clientUDP.on('message', (msg, rinfo) => {
 
 if(conectar_tcp){
+  puertoServer=rinfo.port;
+  ipServer=rinfo.address;
   console.log("PUERTO TCP "+msg);
   clientUDP.close();
   TCP(rinfo.address,parseInt(msg));
@@ -59,5 +63,7 @@ function TCP(ip_tcp,port_tcp){
 }
 
 function desconectar() {
+  clientTCP.write("Cerrar");
+    console.log('Mensaje para cerrar');
   clientTCP.destroy();
 }
