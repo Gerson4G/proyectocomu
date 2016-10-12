@@ -1,18 +1,26 @@
-var fecha = [];
-var portTCP = [];
+
+
+
+var listaM = [];
 net = require('net');
 var ip = require('ip');
 var enviarPuerto = false;
-var hostnames = [];
-var ips = [];
-var cerrado = false;
+var cerrado= false;
+
+function Maquina(tiempo,puerto,nombre,ip) {
+  this.tiempo=tiempo;
+  this.puerto=puerto;
+  this.hostname=nombre;
+  this.ip=ip;
+  this.cerrado=false;
+}
 
 function iniciar() {
 
   var dgram = require('dgram');
   var socket = dgram.createSocket('udp4');
 
-  var testMessage = "[hello world] pid: " + process.pid;
+  var testMessage = "";
   var broadcastAddress = '255.255.255.255';
   var broadcastPort = 5555;
 
@@ -22,16 +30,16 @@ function iniciar() {
   });
   socket.on('message', (msg, rinfo) => {
     console.log("Message received from " + rinfo.address);
-    portTCP.push(abrirPuerto());
-    hostnames.push(msg.toString());
-    ips.push(rinfo.address);
-    TCP(ip.address,portTCP[portTCP.length-1]);
+
+    listaM.push(new Maquina(0,abrirPuerto(),msg.toString(),rinfo.address));
+
+    TCP(ip.address,listaM[listaM.length-1].puerto);
     enviarPuerto = true;
 
     if(enviarPuerto){
-      console.log('ENVIANDO PUERTO '+portTCP[portTCP.length-1]);
-      var mensaje = portTCP[portTCP.length-1].toString();
-      socket.send(new Buffer (mensaje), 0, mensaje.length, rinfo.port , rinfo.address, function(err, bytes) {
+      console.log('ENVIANDO PUERTO '+listaM[listaM.length-1].puerto);
+      var mensaje = listaM[listaM.length-1].puerto.toString();
+      socket.send(new Buffer (mensaje), 0, mensaje.length, rinfo.port , listaM[listaM.length-1].ip, function(err, bytes) {
         if (err) throw err;
         console.log('Puerto enviado');
       });
@@ -39,8 +47,6 @@ function iniciar() {
     }
 
   });
-
-
 
   setInterval(function () {
  	socket.send(new Buffer(testMessage),
@@ -59,28 +65,25 @@ function iniciar() {
 
 function TCP(ip,port_tcp){
 
+    var pos=listaM.length-1;
     serverTCP = net.createServer(function(socket) {
     console.log('client connected');
-    fecha.push(new Date().getTime());
-    socket.name = socket.remoteAddress;
+    listaM[listaM.length-1].tiempo=new Date().getTime();
 
     socket.on('error', (e) => {
-
+        console.log(e);
             console.log(socket.name);
-
      });
     socket.on('end', () => {
+
+        registroTiempo(socket,pos);
         console.log('client disconnected');
-        console.log(socket.remoteAddress);
-
-          registroTiempo(socket,cerrado)
-
     });
 
     socket.on('data', (data) => {
         //console.log("llego por TCP.......");
         if(data.toString()=="Cerrar"){
-            cerrado=true;
+              cerrado=true;
             }
     });
 
@@ -94,23 +97,14 @@ function abrirPuerto() {
   return Math.floor((Math.random() * 9999) + 2500);
 }
 
-function registroTiempo(socket,check){
+function registroTiempo(socket, pos){
 
-if(check)
-  for(i=0;i<ips.length;i++){
-      if(socket.remoteAddress.replace(/^.*:/, '')==ips[i]){ //lo q pasa
-                        // es q remoteAddress esta como ipv6 y anexa ::ffff:direccion entonces asi le quito lo de ipv6
-      var aux=new Date();
-      fecha[i]=(aux.getTime()-fecha[i])/1000;
-      }
-    }
+if(!cerrado)
+  listaM[pos].tiempo=0;
 else {
-  for(i=0;i<ips.length;i++){
-      if(socket.remoteAddress.replace(/^.*:/, '')==ips[i]){
-      fecha[i]=0;
-      }
-    }
-
+  var aux=new Date();
+  console.log("POS"+pos);
+  listaM[pos].tiempo=(aux.getTime()-listaM[pos].tiempo)/1000;
+  cerrado=false;
 }
-cerrado=false;
 }
