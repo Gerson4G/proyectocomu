@@ -1,11 +1,11 @@
 
-
-
 var listaM = [];
 net = require('net');
 var ip = require('ip');
 var enviarPuerto = false;
 var cerrado= false;
+var puertoTCP=7777;
+var tiempoEnvio=1000;
 
 function Maquina(tiempo,puerto,nombre,ip) {
   this.tiempo=tiempo;
@@ -32,13 +32,16 @@ function iniciar() {
     console.log("Message received from " + rinfo.address);
 
     listaM.push(new Maquina(0,abrirPuerto(),msg.toString(),rinfo.address));
+    //listaM.push(new Maquina(0,puertoTCP,msg.toString(),rinfo.address));
 
     TCP(ip.address,listaM[listaM.length-1].puerto);
+    //TCP(ip.address,puertoTCP)
     enviarPuerto = true;
 
     if(enviarPuerto){
       console.log('ENVIANDO PUERTO '+listaM[listaM.length-1].puerto);
       var mensaje = listaM[listaM.length-1].puerto.toString();
+      //var mensaje = puertoTCP.toString();
       socket.send(new Buffer (mensaje), 0, mensaje.length, rinfo.port , listaM[listaM.length-1].ip, function(err, bytes) {
         if (err) throw err;
         console.log('Puerto enviado');
@@ -60,7 +63,7 @@ function iniciar() {
   				console.log("Message sent");
   			}
   	);
-  }, 1000);
+  }, tiempoEnvio);
 }
 
 function TCP(ip,port_tcp){
@@ -103,7 +106,7 @@ if(!cerrado)
   listaM[pos].tiempo=0;
 else {
   var aux=new Date();
-  console.log("POS"+pos);
+  listaM[pos].cerrado=true;
   listaM[pos].tiempo=(aux.getTime()-listaM[pos].tiempo)/1000;
   cerrado=false;
 }
